@@ -1,0 +1,12 @@
+/bin
+build
+.classpath
+.project
+.settings
+.idea
+/.gradle/
+/.settings/
+/logs/
+config.properties
+local.properties
+config.test
