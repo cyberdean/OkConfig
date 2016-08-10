@@ -7,15 +7,13 @@ import okio.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
- * Configuration file manager (like {@link java.util.Properties} but better)
+ * Properties file manager (like {@link java.util.Properties} but better)
  * @author Dean79000
  */
-public class Configuration {
+public class Properties {
   private File mFile;
   private Map<String, Object> mParams;
 
@@ -24,7 +22,7 @@ public class Configuration {
    * @param file File used to store configuration
    * @throws IOException If fail to create file (if not exist)
    */
-  public Configuration(final File file) throws IOException {
+  public Properties(final File file) throws IOException {
     if (!file.exists()) {
       file.createNewFile();
     }
@@ -33,7 +31,7 @@ public class Configuration {
   }
 
   /**
-   * Load configuration from file (if exist)
+   * Load properties from file (if exist)
    */
   public void load() {
     if (mFile.exists() && mFile.length() > 0) {
@@ -48,7 +46,7 @@ public class Configuration {
   }
 
   /**
-   * Save configuration (erase file or create it)
+   * Save properties (erase file or create it)
    * @throws IOException If fail to create file
    */
   public void save() throws IOException {
@@ -59,7 +57,15 @@ public class Configuration {
   }
 
   /**
-   * Get number of parameters of actual config (in-memory)
+   * Removes all of the properties.
+   * Will be empty after this call returns.
+   */
+  public void clear() {
+    mParams.clear();
+  }
+
+  /**
+   * Get number of parameters of actual properties (in-memory)
    * @return The number of parameters
    */
   public int getSize() {
@@ -67,8 +73,36 @@ public class Configuration {
   }
 
   /**
-   * Get an Object from parameters
-   * @param key Identifier of parameter. Must be unique !
+   * Returns a {@link Set} of all keys.
+   * @return All keys
+   * @see Map#keySet()
+   */
+  public Set<String> keys() {
+    return mParams.keySet();
+  }
+
+  /**
+   * Returns a {@link Set} view of the mappings.
+   * @return a set view of the mappings
+   * @see Map#entrySet()
+   */
+  public Set<Map.Entry<String, Object>> entrySet() {
+    return mParams.entrySet();
+  }
+
+  /**
+   * Remove mapping key/value if exist
+   * @param key Identifier of property.
+   * @return the previous value associated with key, or null if there was no mapping for key.
+   * @see Map#remove(Object)
+   */
+  public Object remove(final String key) {
+    return mParams.remove(key);
+  }
+
+  /**
+   * Get an Object
+   * @param key Identifier of property. Must be unique !
    * @param defaultValue Default value if named key not exist
    * @return value or defaultValue if key not exist
    */
@@ -77,8 +111,8 @@ public class Configuration {
   }
 
   /**
-   * Get an String from parameters
-   * @param key Identifier of parameter. Must be unique !
+   * Get an String
+   * @param key Identifier of property. Must be unique !
    * @param defaultValue Default value if named key not exist
    * @return value or defaultValue if key not exist
    */
@@ -88,8 +122,8 @@ public class Configuration {
   }
 
   /**
-   * Get an boolean from parameters
-   * @param key Identifier of parameter. Must be unique !
+   * Get an boolean
+   * @param key Identifier of property. Must be unique !
    * @param defaultValue Default value if named key not exist
    * @return value or defaultValue if key not exist
    */
@@ -99,8 +133,8 @@ public class Configuration {
   }
 
   /**
-   * Get an Integer from parameters
-   * @param key Identifier of parameter. Must be unique !
+   * Get an Integer
+   * @param key Identifier of property. Must be unique !
    * @param defaultValue Default value if named key not exist
    * @return value or defaultValue if key not exist
    */
@@ -115,8 +149,8 @@ public class Configuration {
   }
 
   /**
-   * Get an float from parameters
-   * @param key Identifier of parameter. Must be unique !
+   * Get an float
+   * @param key Identifier of property. Must be unique !
    * @param defaultValue Default value if named key not exist
    * @return value or defaultValue if key not exist
    */
@@ -131,8 +165,8 @@ public class Configuration {
   }
 
   /**
-   * Get an double from parameters
-   * @param key Identifier of parameter. Must be unique !
+   * Get an double
+   * @param key Identifier of property. Must be unique !
    * @param defaultValue Default value if named key not exist
    * @return value or defaultValue if key not exist
    */
@@ -147,8 +181,8 @@ public class Configuration {
   }
 
   /**
-   * Get an List of Object from parameters
-   * @param key Identifier of parameter. Must be unique !
+   * Get an List of Object
+   * @param key Identifier of property. Must be unique !
    * @param defaultValue Default value if named key not exist
    * @return value or defaultValue if key not exist
    */
@@ -158,8 +192,8 @@ public class Configuration {
   }
 
   /**
-   *  Get an Map of String, Object from parameters
-   * @param key Identifier of parameter. Must be unique !
+   *  Get an Map of String, Object
+   * @param key Identifier of property. Must be unique !
    * @param defaultValue Default value if named key not exist
    * @return value or defaultValue if key not exist
    */
@@ -169,11 +203,29 @@ public class Configuration {
   }
 
   /**
-   * Define new or edit parameter
-   * @param key Identifier of parameter. Must be unique !
-   * @param value Value
+   * Define new or edit property
+   * @param key Identifier of property. Must be unique !
+   * @param value Value  Support ONLY : String, Number, Boolean, CharSequence, Map, List
    */
   public void setValue(final String key, final Object value) {
     mParams.put(key, value);
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    final Properties that = (Properties) o;
+
+    if (mFile != null ? !mFile.equals(that.mFile) : that.mFile != null) return false;
+    return mParams != null ? mParams.equals(that.mParams) : that.mParams == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = mFile != null ? mFile.hashCode() : 0;
+    result = 31 * result + (mParams != null ? mParams.hashCode() : 0);
+    return result;
   }
 }

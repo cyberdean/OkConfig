@@ -9,8 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class ConfigurationTest {
-  private Configuration config;
+public class PropertiesTest {
+  private Properties config;
   private final File f = new File("config.test");
 
   @Before
@@ -18,7 +18,7 @@ public class ConfigurationTest {
     if (f.exists()) {
       if (!f.delete()) throw  new RuntimeException("Cannot delete test file");
     }
-    config = new Configuration(f);
+    config = new Properties(f);
   }
 
 
@@ -40,7 +40,8 @@ public class ConfigurationTest {
     config.save();
   }
 
-  @Test
+  /* limitation of okjson
+ @Test
   public void testObject() throws IOException {
     assertEquals(0, config.getSize());
     config.load();
@@ -52,6 +53,19 @@ public class ConfigurationTest {
     config.load();
     assertEquals(bytes, config.optObject("obj", null));
   }
+
+  @Test
+  public void testSet() throws IOException {
+    assertEquals(0, config.getSize());
+    config.load();
+    assertEquals(0, config.getSize());
+
+    final Set<String> bytes = new HashSet<>(Arrays.asList("1", "test 2", "3"));
+    config.setValue("obj", bytes);
+    config.save();
+    config.load();
+    assertEquals(bytes, config.optObject("obj", null));
+  }*/
 
 
   @Test
@@ -163,4 +177,114 @@ public class ConfigurationTest {
     assertNull(config.optMap("notExist", null));
   }
 
+  @Test
+  public void testEquals() throws IOException {
+    assertEquals(0, config.getSize());
+    assertTrue(config.equals(config));
+    assertFalse(config.equals(null));
+    assertFalse(config.equals(""));
+
+    final Properties prop = new Properties(f);
+    assertTrue(prop.equals(config));
+    assertEquals(config.hashCode(), prop.hashCode());
+
+    config.setValue("akey", true);
+    assertFalse(prop.equals(config));
+    assertNotEquals(config.hashCode(), prop.hashCode());
+
+    prop.setValue("akey", false);
+    assertFalse(prop.equals(config));
+    assertNotEquals(config.hashCode(), prop.hashCode());
+
+    prop.setValue("akey", true);
+    assertTrue(prop.equals(config));
+    assertEquals(config.hashCode(), prop.hashCode());
+  }
+
+  @Test
+  public void testRemove() throws IOException {
+    assertEquals(0, config.getSize());
+    config.load();
+    assertEquals(0, config.getSize());
+
+    assertNull(config.remove("notExist"));
+    config.setValue("akey", true);
+    assertEquals(1, config.getSize());
+
+    config.save();
+    config.load();
+    assertEquals(1, config.getSize());
+
+    assertEquals(true, config.remove("akey"));
+    assertEquals(0, config.getSize());
+
+    config.save();
+    config.load();
+    assertEquals(0, config.getSize());
+  }
+
+  @Test
+  public void testClear() throws IOException {
+    assertEquals(0, config.getSize());
+    config.load();
+    assertEquals(0, config.getSize());
+
+    config.setValue("akey", true);
+    assertEquals(1, config.getSize());
+
+    config.save();
+    config.load();
+    assertEquals(1, config.getSize());
+
+    config.clear();
+    assertEquals(0, config.getSize());
+
+    config.save();
+    config.load();
+    assertEquals(0, config.getSize());
+  }
+
+  @Test
+  public void testKeys() throws IOException {
+    assertEquals(0, config.getSize());
+
+    config.setValue("akey", true);
+    config.setValue("key 2", 42);
+    config.setValue("Key 3", "oui");
+    assertEquals(3, config.getSize());
+
+    assertEquals(3, config.keys().size());
+    assertTrue(config.keys().contains("akey"));
+    assertTrue(config.keys().contains("key 2"));
+    assertTrue(config.keys().contains("Key 3"));
+    assertFalse(config.keys().contains("NotExist"));
+  }
+
+  @Test
+  public void testEntrySet() throws IOException {
+    assertEquals(0, config.getSize());
+
+    config.setValue("akey", true);
+    config.setValue("key 2", 42);
+    config.setValue("Key 3", "oui");
+    assertEquals(3, config.getSize());
+
+    assertEquals(3, config.entrySet().size());
+
+    for (final Map.Entry<String, Object> entry : config.entrySet()) {
+      if (entry.getKey().equals("akey")) {
+        assertEquals(true, entry.getValue());
+      }
+      else if (entry.getKey().equals("key 2")) {
+        assertEquals(42, entry.getValue());
+      }
+      else if (entry.getKey().equals("Key 3")) {
+        assertEquals("oui", entry.getValue());
+      }
+      else {
+        fail("Unknown key : " + entry.getKey());
+      }
+    }
+
+  }
 }

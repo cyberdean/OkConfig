@@ -6,12 +6,15 @@ buildscript {
         jcenter()
     }
     dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
         classpath 'org.jsoup:jsoup:1.9.2'
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'jacoco'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -61,7 +64,7 @@ test {
         int cov = docCov.select('#coveragetable > tfoot > tr > .ctr2').first().text().replaceAll("[^\\d.]", "") as int
         String covColor = cov > 90 ? 'green' : (cov < 50 ? 'yellow' : 'red')*/
 
-        def readme = file('../README.md')
+        def readme = file('./README.md')
         def badge = { String label, String text, String color ->
             "https://img.shields.io/badge/_${label}_-_${text}-${color}.png?style=flat"
         }
