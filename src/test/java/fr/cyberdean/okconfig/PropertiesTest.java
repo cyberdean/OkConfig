@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * @author Dean79000
+ */
 public class PropertiesTest {
   private Properties config;
   private final File f = new File("config.test");
@@ -40,34 +43,6 @@ public class PropertiesTest {
     config.save();
   }
 
-  /* limitation of okjson
- @Test
-  public void testObject() throws IOException {
-    assertEquals(0, config.getSize());
-    config.load();
-    assertEquals(0, config.getSize());
-
-    final Byte[] bytes = new Byte[] {0, 1};
-    config.setValue("obj", bytes);
-    config.save();
-    config.load();
-    assertEquals(bytes, config.optObject("obj", null));
-  }
-
-  @Test
-  public void testSet() throws IOException {
-    assertEquals(0, config.getSize());
-    config.load();
-    assertEquals(0, config.getSize());
-
-    final Set<String> bytes = new HashSet<>(Arrays.asList("1", "test 2", "3"));
-    config.setValue("obj", bytes);
-    config.save();
-    config.load();
-    assertEquals(bytes, config.optObject("obj", null));
-  }*/
-
-
   @Test
   public void testString() throws IOException {
     assertEquals(0, config.getSize());
@@ -75,9 +50,11 @@ public class PropertiesTest {
     assertEquals(0, config.getSize());
 
     config.setValue("str", "default string");
+    config.setValue("Notstr", -1);
     config.save();
     config.load();
     assertEquals("default string", config.optString("str", null));
+    assertNull(config.optString("Notstr", null));
   }
 
   @Test
@@ -87,6 +64,7 @@ public class PropertiesTest {
     assertEquals(0, config.getSize());
 
     config.setValue("boolean", true);
+    config.setValue("NotBool", "No");
     config.save();
     config.load();
     assertEquals(true, config.optBoolean("boolean", false));
@@ -97,6 +75,8 @@ public class PropertiesTest {
     assertEquals(false, config.optBoolean("boolean", true));
     assertEquals(true, config.optBoolean("notExist", true));
     assertEquals(false, config.optBoolean("notExist", false));
+    assertFalse(config.optBoolean("NotBool", false));
+    assertTrue(config.optBoolean("NotBool", true));
   }
 
 
