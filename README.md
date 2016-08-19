@@ -10,7 +10,10 @@ Data are stored under JSON representation. (Easy to use with other program)
 
 ## Download ##
 
-Soon on jcenter
+JCenter :
+```
+compile 'fr.cyberdean:okconfig:1.0'
+```
 
 ## Usage ##
 

@@ -116,7 +116,7 @@ publishing {
 
 
 bintray {
-  user = 'Cyberdean'
+  user = 'cyberdean'
   key = getBintrayApiKey()
   dryRun = false
   publish = true
